@@ -8,18 +8,18 @@ class SnakeGame:
         self.height = 4
         self.snake = [(2, 2)]
         self.direction = "RIGHT"
-        self.food = (random.randint(1, self.height - 1), random.randint(1, self.width - 1))
+        self.food = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
         self.score = 0
 
     def draw_cell(self, y, x):
         if (y, x) == self.snake[0]:
-            return " O " 
+            return " O "
         elif (y, x) in self.snake:
-            return " () "  
+            return " () "
         elif (y, x) == self.food:
-            return " * " 
+            return " * "
         else:
-            return " - "  
+            return " - "
 
     def draw_row(self, y):
         return "".join(self.draw_cell(y, x) for x in range(self.width))
@@ -33,30 +33,41 @@ class SnakeGame:
     def move(self):
         head_y, head_x = self.snake[0]
         if self.direction == "UP":
-            new_head = (head_y - 1, head_x)
+            return (head_y - 1, head_x)
         elif self.direction == "DOWN":
-            new_head = (head_y + 1, head_x)
+            return (head_y + 1, head_x)
         elif self.direction == "LEFT":
-            new_head = (head_y, head_x - 1)
+            return (head_y, head_x - 1)
         elif self.direction == "RIGHT":
-            new_head = (head_y, head_x + 1)
-        return new_head
+            return (head_y, head_x + 1)
+
+    def is_invalid_move(self, position):
+        return (
+            position[0] < 0 or position[0] >= self.height or 
+            position[1] < 0 or position[1] >= self.width or 
+            position in self.snake
+        )
+
+    def handle_food_collision(self, position):
+        if position == self.food:
+            self.score += 1
+            self.spawn_food()
+            return True
+        return False
+
+    def spawn_food(self):
+        self.food = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+
+    def move_snake(self, position):
+        self.snake.insert(0, position)
+        if not self.handle_food_collision(position):
+            self.snake.pop()
 
     def update(self):
         new_head = self.move()
-        if (new_head[0] < 0 or new_head[0] >= self.height or
-            new_head[1] < 0 or new_head[1] >= self.width or
-            new_head in self.snake):
+        if self.is_invalid_move(new_head):
             return False
-
-        self.snake.insert(0, new_head)
-
-        if new_head == self.food:
-            self.score += 1
-            self.food = (random.randint(1, self.height - 1), random.randint(1, self.width - 1))
-        else:
-            self.snake.pop()
-
+        self.move_snake(new_head)
         return True
 
     def play(self):
@@ -79,3 +90,5 @@ class SnakeGame:
 
 game = SnakeGame()
 game.play()
+
+
