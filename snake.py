@@ -11,20 +11,24 @@ class SnakeGame:
         self.food = (random.randint(1, self.height - 1), random.randint(1, self.width - 1))
         self.score = 0
 
+    def draw_cell(self, y, x):
+        if (y, x) == self.snake[0]:
+            return " O " 
+        elif (y, x) in self.snake:
+            return " () "  
+        elif (y, x) == self.food:
+            return " * " 
+        else:
+            return " - "  
+
+    def draw_row(self, y):
+        return "".join(self.draw_cell(y, x) for x in range(self.width))
+
     def draw(self):
         os.system("cls" if os.name == "nt" else "clear")
         for y in range(self.height):
-            for x in range(self.width):
-                if (y, x) == self.snake[0]:
-                    print(" O ", end="")
-                elif (y, x) in self.snake:
-                    print(" () ", end="")
-                elif (y, x) == self.food:
-                    print(" * ", end="")
-                else:
-                    print(" - ", end="")
-            print()
-        print("Score:", self.score)
+            print(self.draw_row(y))
+        print(f"Score: {self.score}")
 
     def move(self):
         head_y, head_x = self.snake[0]
