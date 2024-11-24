@@ -1,9 +1,11 @@
 import random
 import os
 import time
+import curses  
 
 class SnakeGame:
-    def __init__(self):
+    def __init__(self, stdscr):
+        self.stdscr = stdscr 
         self.width = 5
         self.height = 4
         self.snake = [(2, 2)]
@@ -25,10 +27,11 @@ class SnakeGame:
         return "".join(self.draw_cell(y, x) for x in range(self.width))
 
     def draw(self):
-        os.system("cls" if os.name == "nt" else "clear")
+        self.stdscr.clear()  # برای پاک کردن صفحه
         for y in range(self.height):
-            print(self.draw_row(y))
-        print(f"Score: {self.score}")
+            self.stdscr.addstr(y, 0, self.draw_row(y))
+        self.stdscr.addstr(self.height, 0, f"Score: {self.score}")
+        self.stdscr.refresh()
 
     def move(self):
         head_y, head_x = self.snake[0]
@@ -74,23 +77,27 @@ class SnakeGame:
     def play(self):
         while True:
             self.draw()
-            command = input("Move (U/D/L/R): ").upper()
-            if command == "U" and self.direction != "DOWN":
+            key = self.stdscr.getch() 
+            if key == curses.KEY_UP and self.direction != "DOWN":
                 self.direction = "UP"
-            elif command == "D" and self.direction != "UP":
+            elif key == curses.KEY_DOWN and self.direction != "UP":
                 self.direction = "DOWN"
-            elif command == "L" and self.direction != "RIGHT":
+            elif key == curses.KEY_LEFT and self.direction != "RIGHT":
                 self.direction = "LEFT"
-            elif command == "R" and self.direction != "LEFT":
+            elif key == curses.KEY_RIGHT and self.direction != "LEFT":
                 self.direction = "RIGHT"
 
             if not self.update():
-                print("Game Over!")
+                self.stdscr.addstr(self.height + 1, 0, "Game Over!")
+                self.stdscr.refresh()
+                time.sleep(1)
                 break
             time.sleep(0.2)
+def main(stdscr):
+    game = SnakeGame(stdscr)
+    game.play()
+curses.wrapper(main)
 
-game = SnakeGame()
-game.play()
 
 
 
