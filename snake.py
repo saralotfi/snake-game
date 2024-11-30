@@ -27,7 +27,7 @@ class SnakeGame:
         return "".join(self.draw_cell(y, x) for x in range(self.width))
 
     def draw(self):
-        self.stdscr.clear()  # برای پاک کردن صفحه
+        self.stdscr.clear() 
         for y in range(self.height):
             self.stdscr.addstr(y, 0, self.draw_row(y))
         self.stdscr.addstr(self.height, 0, f"Score: {self.score}")
@@ -60,7 +60,11 @@ class SnakeGame:
         return False
 
     def spawn_food(self):
-        self.food = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+        while True:
+            new_food = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+            if new_food not in self.snake:  
+                self.food = new_food
+                break
 
     def move_snake(self):
         new_head = self.move()
