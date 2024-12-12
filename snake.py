@@ -1,14 +1,13 @@
 import random
-import os
 import time
-import curses  
+import curses
 
 class SnakeGame:
     def __init__(self, stdscr):
-        self.stdscr = stdscr 
-        self.width = 5
-        self.height = 4
-        self.snake = [(2, 2)]
+        self.stdscr = stdscr
+        self.width = 10
+        self.height = 8
+        self.snake = [(4, 4)]
         self.direction = "RIGHT"
         self.food = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
         self.score = 0
@@ -27,7 +26,7 @@ class SnakeGame:
         return "".join(self.draw_cell(y, x) for x in range(self.width))
 
     def draw(self):
-        self.stdscr.clear() 
+        self.stdscr.clear()
         for y in range(self.height):
             self.stdscr.addstr(y, 0, self.draw_row(y))
         self.stdscr.addstr(self.height, 0, f"Score: {self.score}")
@@ -62,7 +61,7 @@ class SnakeGame:
     def spawn_food(self):
         while True:
             new_food = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
-            if new_food not in self.snake:  
+            if new_food not in self.snake:
                 self.food = new_food
                 break
 
@@ -81,8 +80,12 @@ class SnakeGame:
     def play(self):
         while True:
             self.draw()
-            key = self.stdscr.getch() 
-            if key == curses.KEY_UP and self.direction != "DOWN":
+            key = self.stdscr.getch()
+            if key == ord('m'):  
+                choice = self.show_menu()
+                if choice == "Exit":
+                    break
+            elif key == curses.KEY_UP and self.direction != "DOWN":
                 self.direction = "UP"
             elif key == curses.KEY_DOWN and self.direction != "UP":
                 self.direction = "DOWN"
@@ -97,11 +100,35 @@ class SnakeGame:
                 time.sleep(1)
                 break
             time.sleep(0.2)
+
+    def show_menu(self):
+        menu_items = ["Continue", "Exit"]
+        current_row = 0
+        curses.start_color()
+        curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+
+        while True:
+            self.stdscr.clear()
+            for idx, item in enumerate(menu_items):
+                if idx == current_row:
+                    self.stdscr.addstr(idx, 0, item, curses.color_pair(1))
+                else:
+                    self.stdscr.addstr(idx, 0, item)
+            self.stdscr.refresh()
+
+            key = self.stdscr.getch()
+            if key == curses.KEY_UP and current_row > 0:
+                current_row -= 1
+            elif key == curses.KEY_DOWN and current_row < len(menu_items) - 1:
+                current_row += 1
+            elif key == 10:  
+                if current_row == 0:  
+                    return "Continue"
+                elif current_row == 1:  
+                    return "Exit"
+
 def main(stdscr):
     game = SnakeGame(stdscr)
     game.play()
-curses.wrapper(main)
 
-
-
-
+curses.wrapper(main)   
