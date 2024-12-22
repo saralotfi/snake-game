@@ -29,7 +29,7 @@ class SnakeGame:
         self.stdscr.clear()
         for y in range(self.height):
             self.stdscr.addstr(y, 0, self.draw_row(y))
-        self.stdscr.addstr(self.height, 0, f"Score: {self.score}")
+        self.stdscr.addstr(self.height, 0, f"Score: {self.score} | Press 'm' for menu")
         self.stdscr.refresh()
 
     def move(self):
